@@ -16,16 +16,28 @@ class RedisClient {
   }
 
   async get(key) {
-    const data = await this.getAsync(key);
-    return data;
+    try {
+      const data = await this.getAsync(key);
+      return data;
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   async set(key, value, duration) {
-    await this.setAsync(key, duration, value);
+    try {
+      await this.setAsync(key, duration, value);
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   async del(key) {
-    await this.delAsync(key);
+    try {
+      await this.delAsync(key);
+    } catch (err) {
+      console.log(err);
+    }
   }
 }
 
