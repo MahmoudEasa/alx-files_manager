@@ -1,2 +1,11 @@
 #!/usr/bin/env bash
-npx eslint --fix $1
+PATHS=(
+    "server.js"
+    "worker.js"
+    "utils/*"
+    "routes/*"
+    "controllers/*"
+    # "tests/*"
+)
+
+npx eslint --fix "${PATHS[@]}"
