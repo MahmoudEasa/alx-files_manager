@@ -24,7 +24,7 @@ class AuthController {
       const userId = user._id.toString();
       const duration = (24 * (60 * 60));
 
-      await RedisClient.client.set(redisKey, userId, duration);
+      await RedisClient.setAsync(redisKey, duration, userId);
       return res.status(200).json({ token });
     } catch (err) {
       console.log(err);
