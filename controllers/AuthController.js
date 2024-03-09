@@ -7,9 +7,14 @@ class AuthController {
   static async getConnect(req, res) {
     try {
       const authHeader = req.header('Authorization');
+      if (!authHeader || !authHeader.startsWith('Basic ')) {
+        return res.status(401).json({ error: 'Unauthorized' });
+      }
+
       const base64Credentials = authHeader.split(' ')[1];
       const credentials = Buffer.from(base64Credentials, 'base64').toString('utf-8');
       const [email, password] = credentials.split(':');
+
       const hashedPassword = sha1(password);
       const user = await DBClient.userCollection.findOne({ email, password: hashedPassword });
       if (!user) return res.status(401).json({ error: 'Unauthorized' });
@@ -19,7 +24,7 @@ class AuthController {
       const userId = user._id.toString();
       const duration = (24 * (60 * 60));
 
-      await RedisClient.setAsync(redisKey, duration, userId);
+      await RedisClient.client.set(redisKey, userId, duration);
       return res.status(200).json({ token });
     } catch (err) {
       console.log(err);
