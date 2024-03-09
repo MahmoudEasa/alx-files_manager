@@ -43,7 +43,7 @@ class AuthController {
       if (!id) return res.status(401).json({ error: 'Unauthorized' });
 
       await RedisClient.delAsync(redisKey);
-      return res.status(204).json({id});
+      return res.status(204);
     } catch (err) {
       console.log(err);
       return res.status(500).json({ error: 'Internal Server Error' });
