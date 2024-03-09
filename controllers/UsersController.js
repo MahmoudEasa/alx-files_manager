@@ -35,7 +35,7 @@ class UsersController {
 
   static async getMe(req, res) {
     try {
-      const token = req.headers['x-token'];
+      const token = req.header('x-token');
       if (!token) return res.status(400).json({ error: 'Missing X-Token' });
 
       const redisKey = `auth_${token}`;

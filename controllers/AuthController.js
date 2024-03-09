@@ -6,7 +6,7 @@ import sha1Hash from '../utils/hashUtils';
 class AuthController {
   static async getConnect(req, res) {
     try {
-      const authHeader = req.headers.authorization;
+      const authHeader = req.header('Authorization');
       if (!authHeader || !authHeader.startsWith('Basic ')) {
         return res.status(401).json({ error: 'Unauthorized' });
       }
@@ -35,7 +35,7 @@ class AuthController {
 
   static async getDisconnect(req, res) {
     try {
-      const token = req.headers['x-token'];
+      const token = req.header('x-token');
       if (!token) return res.status(400).json({ error: 'Missing X-Token' });
 
       const redisKey = `auth_${token}`;
@@ -43,7 +43,7 @@ class AuthController {
       if (!id) return res.status(401).json({ error: 'Unauthorized' });
 
       await RedisClient.delAsync(redisKey);
-      return res.status(204);
+      return res.status(204).json({});
     } catch (err) {
       console.log(err);
       return res.status(500).json({ error: 'Internal Server Error' });
