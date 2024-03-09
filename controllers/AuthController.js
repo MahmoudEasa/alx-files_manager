@@ -1,7 +1,7 @@
+import { v4 as uuidv4 } from 'uuid';
 import RedisClient from '../utils/redis';
 import DBClient from '../utils/db';
 import sha1Hash from '../utils/hashUtils';
-import { v4 as uuidv4 } from 'uuid';
 
 class AuthController {
   static async getConnect(req, res) {
