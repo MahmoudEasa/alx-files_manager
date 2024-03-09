@@ -6,7 +6,7 @@ import DBClient from '../utils/db';
 class AuthController {
   static async getConnect(req, res) {
     try {
-      const authHeader = req.header('Authorization');
+      const authHeader = req.headers.authorization;
       if (!authHeader || !authHeader.startsWith('Basic ')) {
         return res.status(401).json({ error: 'Unauthorized' });
       }
@@ -16,8 +16,10 @@ class AuthController {
       const [email, password] = credentials.split(':');
 
       const hashedPassword = sha1(password);
-      const user = await DBClient.userCollection.findOne({ email, password: hashedPassword });
-      if (!user) return res.status(401).json({ error: 'Unauthorized' });
+      const user = await DBClient.userCollection.findOne({ email });
+      if (!user || user.password !== hashedPassword) {
+        return res.status(401).json({ error: 'Unauthorized' });
+      }
 
       const token = uuidv4();
       const redisKey = `auth_${token}`;
