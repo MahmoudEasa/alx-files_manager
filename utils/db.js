@@ -4,10 +4,12 @@ class DBClient {
   constructor() {
     const host = process.env.DB_HOST || 'localhost';
     const port = process.env.DB_PORT || 27017;
-    const database = process.env.DB_DATABASE || 'files_manager';
-    const url = `mongodb://${host}:${port}/${database}`;
-    this.connected = false;
+    this.database = process.env.DB_DATABASE || 'files_manager';
+    const url = `mongodb://${host}:${port}/${this.database}`;
     this.client = new MongoClient(url, { useNewUrlParser: true, useUnifiedTopology: true });
+    this.connected = false;
+    this.userCollection = null;
+    this.filesCollection = null;
     this.connect();
   }
 
@@ -15,6 +17,8 @@ class DBClient {
     try {
       await this.client.connect();
       this.connected = true;
+      this.userCollection = this.client.db(this.database).collection('users');
+      this.filesCollection = this.client.db(this.database).collection('files');
     } catch (error) {
       this.connected = false;
     }
@@ -27,7 +31,7 @@ class DBClient {
   async nbUsers() {
     let userCount = null;
     try {
-      userCount = await this.client.db().collection('users').countDocuments();
+      userCount = await this.userCollection.countDocuments();
     } catch (err) {
       console.log(err);
     }
@@ -37,7 +41,7 @@ class DBClient {
   async nbFiles() {
     let filesCount = null;
     try {
-      filesCount = await this.client.db().collection('files').countDocuments();
+      filesCount = await this.filesCollection.countDocuments();
     } catch (err) {
       console.log(err);
     }
