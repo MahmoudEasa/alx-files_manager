@@ -22,7 +22,7 @@ class AuthController {
       const token = uuidv4();
       const redisKey = `auth_${token}`;
       const userId = user._id.toString();
-      const duration = (24 * 60 * 60);
+      const duration = (24 * (60 * 60));
 
       await RedisClient.setAsync(redisKey, duration, userId);
       return res.status(200).json({ token });

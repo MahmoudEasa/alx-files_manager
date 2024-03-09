@@ -47,7 +47,7 @@ class UsersController {
       if (!user) return res.status(401).json({ error: 'Unauthorized' });
 
       const data = {
-        id,
+        id: user._id,
         email: user.email,
       };
 
