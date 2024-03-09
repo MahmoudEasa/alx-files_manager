@@ -22,8 +22,8 @@ class UsersController {
       const user = await DBClient.userCollection.insertOne(data);
       const [userObj] = user.ops;
       data = {
-        email: userObj.email,
         id: userObj._id,
+        email: userObj.email,
       };
 
       return res.status(201).json(data);
