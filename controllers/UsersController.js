@@ -51,7 +51,7 @@ class UsersController {
         id: user._id,
       };
 
-      return res.status(201).json(data);
+      return res.json(data);
     } catch (err) {
       console.log(err);
       return res.status(500).json({ error: 'Internal Server Error' });

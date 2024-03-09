@@ -26,7 +26,7 @@ class AuthController {
       const duration = (24 * 60 * 60);
       await RedisClient.setAsync(redisKey, duration, userId);
 
-      return res.status(201).json({ token });
+      return res.status(200).json({ token });
     } catch (err) {
       console.log(err);
       return res.status(500).json({ error: 'Internal Server Error' });
