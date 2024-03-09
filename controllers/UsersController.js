@@ -29,7 +29,6 @@ class UsersController {
       return res.status(201).json(data);
     } catch (err) {
       console.log(err);
-      return res.status(500).json({ error: 'Internal Server Error' });
     }
   }
 
@@ -54,7 +53,6 @@ class UsersController {
       return res.status(200).json(data);
     } catch (err) {
       console.log(err);
-      return res.status(500).json({ error: 'Internal Server Error' });
     }
   }
 }
