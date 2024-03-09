@@ -1,7 +1,7 @@
 import { ObjectId } from 'mongodb';
+import sha1 from 'sha1';
 import RedisClient from '../utils/redis';
 import DBClient from '../utils/db';
-import sha1Hash from '../utils/hashUtils';
 
 class UsersController {
   static async postNew(req, res) {
@@ -16,7 +16,7 @@ class UsersController {
 
       let data = {
         email,
-        password: sha1Hash(password),
+        password: sha1(password),
       };
 
       const user = await DBClient.userCollection.insertOne(data);
