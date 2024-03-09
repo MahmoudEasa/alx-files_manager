@@ -1,7 +1,7 @@
 import { ObjectId } from 'mongodb';
-import sha1 from 'sha1';
 import RedisClient from '../utils/redis';
 import DBClient from '../utils/db';
+import sha1 from 'sha1';
 
 class UsersController {
   static async postNew(req, res) {
@@ -29,6 +29,7 @@ class UsersController {
       return res.status(201).json(data);
     } catch (err) {
       console.log(err);
+      return res.status(500).json({ error: 'Internal Server Error' });
     }
   }
 
@@ -46,13 +47,14 @@ class UsersController {
       if (!user) return res.status(401).json({ error: 'Unauthorized' });
 
       const data = {
-        email: user.email,
         id,
+        email: user.email,
       };
 
       return res.status(200).json(data);
     } catch (err) {
       console.log(err);
+      return res.status(500).json({ error: 'Internal Server Error' });
     }
   }
 }
