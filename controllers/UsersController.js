@@ -48,10 +48,10 @@ class UsersController {
 
       const data = {
         email: user.email,
-        id: user._id,
+        id,
       };
 
-      return res.json(data);
+      return res.status(200).json(data);
     } catch (err) {
       console.log(err);
       return res.status(500).json({ error: 'Internal Server Error' });
