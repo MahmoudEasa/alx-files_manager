@@ -40,15 +40,15 @@ class UsersController {
 
       const redisKey = `auth_${token}`;
       const id = await RedisClient.getAsync(redisKey);
-      if (!id) return res.status(401).json({ error: 'Unauthorized' });
+      if (!id) return res.status(401).json({ error: 'Unauthorizeds' });
 
       const _id = new ObjectId(id);
       const user = await DBClient.userCollection.findOne({ _id });
-      if (!user) return res.status(401).json({ error: 'Unauthorized' });
+      if (!user) return res.status(401).json({ error: 'Unauthorizeds' });
 
       const data = {
         email: user.email,
-        id,
+        id: "",
       };
 
       return res.status(200).json(data);
