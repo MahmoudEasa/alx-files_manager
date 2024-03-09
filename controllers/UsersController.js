@@ -6,23 +6,15 @@ class UsersController {
     try {
       const { email, password } = req.body;
 
-      if (!email) {
-        return res.status(400).json({ error: 'Missing email' });
-      }
-
-      if (!password) {
-        return res.status(400).json({ error: 'Missing password' });
-      }
+      if (!email) return res.status(400).json({ error: 'Missing email' });
+      if (!password) return res.status(400).json({ error: 'Missing password' });
 
       const existingUser = await DBClient.userCollection.findOne({ email });
-      if (existingUser) {
-        return res.status(400).json({ error: 'Already exists' });
-      }
+      if (existingUser) return res.status(400).json({ error: 'Already exist' });
 
-      const hashedPassword = sha1Hash(password);
       let data = {
         email,
-        password: hashedPassword,
+        password: sha1Hash(password),
       };
 
       const user = await DBClient.userCollection.insertOne(data);
