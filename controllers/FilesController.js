@@ -3,17 +3,32 @@ import { v4 as uuidv4 } from 'uuid';
 import fs from 'fs';
 import RedisClient from '../utils/redis';
 import DBClient from '../utils/db';
+import getToken from '../utils/getToken';
+
+const insertFile = async (fileData) => {
+  const createdFile = await DBClient.filesCollection.insertOne(fileData);
+  const [{
+    _id, userId, name, type, isPublic, parentId,
+  }] = createdFile.ops;
+  const result = {
+    id: _id.toString(),
+    userId,
+    name,
+    type,
+    isPublic,
+    parentId,
+  };
+  return (result);
+};
 
 class FilesController {
   static async postUpload(req, res) {
     try {
-      const token = req.header('X-Token');
-      const redisKey = `auth_${token}`;
-      let userId = await RedisClient.getAsync(redisKey);
+      const userId = await getToken(req);
       if (!userId) return res.status(401).json({ error: 'Unauthorized' });
 
       const FOLDER_PATH = process.env.FOLDER_PATH || '/tmp/files_manager';
-      let {
+      const {
         name,
         type,
         parentId = 0,
@@ -21,7 +36,8 @@ class FilesController {
       } = req.body;
       const { data } = req.body;
       const listOfAcceptedType = ['folder', 'file', 'image'];
-      let _id = ObjectId(userId);
+      const _id = ObjectId(userId);
+
       const user = await DBClient.userCollection.findOne({ _id });
       if (!user) return res.status(400).json({ error: 'User not found' });
 
@@ -51,18 +67,7 @@ class FilesController {
       };
 
       if (type === 'folder') {
-        const createdFile = await DBClient.filesCollection.insertOne(fileData);
-        [{
-          _id, userId, name, type, isPublic, parentId,
-        }] = createdFile.ops;
-        const result = {
-          id: _id.toString(),
-          userId,
-          name,
-          type,
-          isPublic,
-          parentId,
-        };
+        const result = await insertFile(fileData);
         return res.status(201).json(result);
       }
 
@@ -70,19 +75,8 @@ class FilesController {
       await fs.promises.mkdir(FOLDER_PATH, { recursive: true });
       await fs.promises.writeFile(filePath, Buffer.from(data, 'base64'));
       fileData.localPath = filePath;
-      const createdFile = await DBClient.filesCollection.insertOne(fileData);
-      [{
-        _id, userId, name, type, isPublic, parentId,
-      }] = createdFile.ops;
 
-      const result = {
-        id: _id.toString(),
-        userId,
-        name,
-        type,
-        isPublic,
-        parentId,
-      };
+      const result = await insertFile(fileData);
       return res.status(201).json(result);
     } catch (err) {
       console.log(err);
