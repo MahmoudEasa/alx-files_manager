@@ -16,18 +16,15 @@ class FilesController {
       let {
         name,
         type,
-        parentId,
-        isPublic,
+        parentId = 0,
+        isPublic = false,
       } = req.body;
       const { data } = req.body;
       const listOfAcceptedType = ['folder', 'file', 'image'];
       let _id = ObjectId(userId);
       const user = await DBClient.userCollection.findOne({ _id });
-      console.log('user: ', user, 'userId: ', userId);
       if (!user) return res.status(400).json({ error: 'User not found' });
 
-      if (!parentId) parentId = 0;
-      if (!isPublic) isPublic = false;
       if (!name) return res.status(400).json({ error: 'Missing name' });
       if (!type || !(listOfAcceptedType.includes(type))) {
         return res.status(400).json({ error: 'Missing type' });
@@ -74,12 +71,17 @@ class FilesController {
       await fs.promises.writeFile(filePath, Buffer.from(data, 'base64'));
       fileData.localPath = filePath;
       const createdFile = await DBClient.filesCollection.insertOne(fileData);
-      [{ _id, userId, name }] = createdFile.ops;
+      [{
+        _id, userId, name, type, isPublic, parentId,
+      }] = createdFile.ops;
 
       const result = {
         id: _id.toString(),
         userId,
         name,
+        type,
+        isPublic,
+        parentId,
       };
       return res.status(201).json(result);
     } catch (err) {
