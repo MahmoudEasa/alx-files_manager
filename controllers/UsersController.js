@@ -34,22 +34,27 @@ class UsersController {
   }
 
   static async getMe(req, res) {
-    const token = req.header('X-Token');
-    const redisKey = `auth_${token}`;
-    const id = await RedisClient.getAsync(redisKey);
-    if (!id) return res.status(401).json({ error: 'Unauthorized' });
+    try {
+      const token = req.header('X-Token');
+      const redisKey = `auth_${token}`;
+      const id = await RedisClient.getAsync(redisKey);
+      if (!id) return res.status(401).json({ error: 'Unauthorized' });
 
-    const _id = ObjectId(id);
-    const user = await DBClient.userCollection.findOne({ _id });
-    if (!user) return res.status(401).json({ error: 'Unauthorized' });
+      const _id = ObjectId(id);
+      const user = await DBClient.userCollection.findOne({ _id });
+      if (!user) return res.status(401).json({ error: 'Unauthorized' });
 
-    const data = {
-      id: user._id,
-      email: user.email,
-    };
+      const data = {
+        id: user._id,
+        email: user.email,
+      };
 
-    return res.status(200).json(data);
+      return res.status(200).json(data);
+    } catch (err) {
+      console.log(err);
+      return res.status(500).json({ error: 'Internal Server Error' });
+    }
   }
 }
 
-export default (UsersController);
+export default UsersController;

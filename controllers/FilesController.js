@@ -6,18 +6,31 @@ import DBClient from '../utils/db';
 class FilesController {
   static async postUpload(req, res) {
     try {
-      const { email, password } = req.body;
+      const authHeader = req.headers.authorization;
+      if (!authHeader || !authHeader.startsWith('Basic ')) {
+        return res.status(401).json({ error: 'Unauthorized' });
+      }
+      let {
+        name,
+        type,
+        parentId,
+        isPublic,
+        data
+      } = req.body;
+      const listOfAcceptedType = ['folder', 'file', 'image'];
 
-      if (!email) return res.status(400).json({ error: 'Missing email' });
-      if (!password) return res.status(400).json({ error: 'Missing password' });
+      if (!parentId) parentId = 0
+      if (!isPublic) isPublic = false
+
+      if (!name) return res.status(400).json({ error: 'Missing name' });
+      if (!type || !(listOfAcceptedType.includes(type))) return res.status(400).json({ error: 'Missing type' });
+      if (!data && type !== 'folder') return res.status(400).json({ error: 'Missing data' });
+
+      // if (f  )
 
       const existingUser = await DBClient.userCollection.findOne({ email });
       if (existingUser) return res.status(400).json({ error: 'Already exist' });
 
-      let data = {
-        email,
-        password: sha1(password),
-      };
 
       const user = await DBClient.userCollection.insertOne(data);
       const [userObj] = user.ops;
@@ -95,4 +108,4 @@ class FilesController {
   }
 }
 
-export default (FilesController);
+export default FilesController;
