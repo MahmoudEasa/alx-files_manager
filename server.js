@@ -6,7 +6,6 @@ const app = express();
 const port = process.env.PORT || 5000;
 
 app.use(bodyParser.json({ limit: '10mb' }));
-app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
 app.use('/', routes);
 
 app.listen(port, () => {
