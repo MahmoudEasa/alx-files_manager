@@ -34,7 +34,7 @@ class FilesController {
       }
 
       if (parentId) {
-        const parentFile = await DBClient.filesCollection.findOne({ parentId });
+        const parentFile = await DBClient.filesCollection.findOne({ _id: ObjectId(parentId) });
         if (!parentFile) return res.status(400).json({ error: 'Parent not found' });
 
         if (parentFile.type !== 'folder') {
