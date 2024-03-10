@@ -1,45 +1,87 @@
 import { ObjectId } from 'mongodb';
-import sha1 from 'sha1';
+import { v4 as uuidv4 } from 'uuid';
+import fs from 'fs';
 import RedisClient from '../utils/redis';
 import DBClient from '../utils/db';
 
 class FilesController {
   static async postUpload(req, res) {
     try {
-      const authHeader = req.headers.authorization;
-      if (!authHeader || !authHeader.startsWith('Basic ')) {
-        return res.status(401).json({ error: 'Unauthorized' });
-      }
+      const token = req.header('X-Token');
+      const redisKey = `auth_${token}`;
+      let userId = await RedisClient.getAsync(redisKey);
+      if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+
+      const FOLDER_PATH = process.env.FOLDER_PATH || '/tmp/files_manager';
       let {
         name,
         type,
         parentId,
         isPublic,
-        data
       } = req.body;
+      const { data } = req.body;
       const listOfAcceptedType = ['folder', 'file', 'image'];
+      let _id = ObjectId(userId);
+      const user = await DBClient.userCollection.findOne({ _id });
+      console.log('user: ', user, 'userId: ', userId);
+      if (!user) return res.status(400).json({ error: 'User not found' });
 
-      if (!parentId) parentId = 0
-      if (!isPublic) isPublic = false
-
+      if (!parentId) parentId = 0;
+      if (!isPublic) isPublic = false;
       if (!name) return res.status(400).json({ error: 'Missing name' });
-      if (!type || !(listOfAcceptedType.includes(type))) return res.status(400).json({ error: 'Missing type' });
-      if (!data && type !== 'folder') return res.status(400).json({ error: 'Missing data' });
+      if (!type || !(listOfAcceptedType.includes(type))) {
+        return res.status(400).json({ error: 'Missing type' });
+      }
+      if (!data && type !== 'folder') {
+        return res.status(400).json({ error: 'Missing data' });
+      }
 
-      // if (f  )
+      if (parentId) {
+        const parentFile = await DBClient.filesCollection.findOne({ parentId });
+        if (!parentFile) return res.status(400).json({ error: 'Parent not found' });
 
-      const existingUser = await DBClient.userCollection.findOne({ email });
-      if (existingUser) return res.status(400).json({ error: 'Already exist' });
+        if (parentFile.type !== 'folder') {
+          return res.status(400).json({ error: 'Parent is not a folder' });
+        }
+      }
 
-
-      const user = await DBClient.userCollection.insertOne(data);
-      const [userObj] = user.ops;
-      data = {
-        email: userObj.email,
-        id: userObj._id,
+      const fileData = {
+        userId: user._id.toString(),
+        name,
+        type,
+        isPublic,
+        parentId,
       };
 
-      return res.status(201).json(data);
+      if (type === 'folder') {
+        const createdFile = await DBClient.filesCollection.insertOne(fileData);
+        [{
+          _id, userId, name, type, isPublic, parentId,
+        }] = createdFile.ops;
+        const result = {
+          id: _id.toString(),
+          userId,
+          name,
+          type,
+          isPublic,
+          parentId,
+        };
+        return res.status(201).json(result);
+      }
+
+      const filePath = `${FOLDER_PATH}/${uuidv4()}`;
+      await fs.promises.mkdir(FOLDER_PATH, { recursive: true });
+      await fs.promises.writeFile(filePath, Buffer.from(data, 'base64'));
+      fileData.localPath = filePath;
+      const createdFile = await DBClient.filesCollection.insertOne(fileData);
+      [{ _id, userId, name }] = createdFile.ops;
+
+      const result = {
+        id: _id.toString(),
+        userId,
+        name,
+      };
+      return res.status(201).json(result);
     } catch (err) {
       console.log(err);
       return res.status(500).json({ error: 'Internal Server Error' });

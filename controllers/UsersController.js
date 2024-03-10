@@ -42,7 +42,7 @@ class UsersController {
 
       const _id = ObjectId(id);
       const user = await DBClient.userCollection.findOne({ _id });
-      if (!user) return res.status(401).json({ error: 'Unauthorized' });
+      if (!user) return res.status(400).json({ error: 'User not found' });
 
       const data = {
         id: user._id,
