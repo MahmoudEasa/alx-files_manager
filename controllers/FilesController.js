@@ -92,27 +92,8 @@ class FilesController {
       _id = ObjectId(_id);
       userId = ObjectId(userId);
       const file = await DBClient.filesCollection.findOne({ _id, userId });
-      if (file) {
-        const {
-          _id,
-          userId,
-          name,
-          type,
-          isPublic,
-          parentId,
-        } = file;
-
-        const data = {
-          id: _id.toString(),
-          userId,
-          name,
-          type,
-          isPublic,
-          parentId,
-        };
-        return res.status(200).json(data);
-      }
-      return res.status(404).json({ error: 'Not found' });
+      if (!file) return res.status(404).json({ error: 'Not found' });
+      return res.status(200).json(file);
     } catch (err) {
       console.log(err);
       return res.status(500).json({ error: 'Internal Server Error' });
@@ -144,7 +125,7 @@ class FilesController {
       ).toArray();
 
       const result = files.map(({ _id, localPath, ...el }) => ({
-        id: _id.toString(),
+        id: _id,
         ...el,
       }));
 
