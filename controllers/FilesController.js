@@ -86,10 +86,11 @@ class FilesController {
   static async getShow(req, res) {
     try {
       let _id = req.params.id;
-      const userId = await getToken(req);
+      let userId = await getToken(req);
       if (!userId) return res.status(401).json({ error: 'Unauthorized' });
 
       _id = ObjectId(_id);
+      userId = ObjectId(userId);
       const file = await DBClient.filesCollection.findOne({ _id, userId });
       if (file) {
         const {
