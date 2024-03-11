@@ -1,7 +1,6 @@
 import { ObjectId } from 'mongodb';
 import { v4 as uuidv4 } from 'uuid';
 import fs from 'fs';
-import RedisClient from '../utils/redis';
 import DBClient from '../utils/db';
 import getToken from '../utils/getToken';
 
@@ -121,9 +120,11 @@ class FilesController {
 
   static async getIndex(req, res) {
     try {
-      const { parentId = 0, page = 0 } = req.query;
-      const limit = 20;
-      const skip = (+page) * limit;
+      let { parentId = 0, page = 0 } = req.query;
+      if (parentId === '0') parentId = +parentId;
+      page = +page;
+      const limit = 2;
+      const skip = page * limit;
 
       const userId = await getToken(req);
       if (!userId) return res.status(401).json({ error: 'Unauthorized' });
@@ -140,6 +141,7 @@ class FilesController {
           { $limit: limit },
         ],
       ).toArray();
+
       const result = files.map(({ _id, localPath, ...el }) => ({
         id: _id.toString(),
         ...el,
