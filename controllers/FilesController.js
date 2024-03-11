@@ -123,7 +123,7 @@ class FilesController {
       let { parentId = 0, page = 0 } = req.query;
       if (parentId === '0') parentId = +parentId;
       page = +page;
-      const limit = 2;
+      const limit = 20;
       const skip = page * limit;
 
       const userId = await getToken(req);
