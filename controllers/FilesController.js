@@ -89,8 +89,8 @@ class FilesController {
       let userId = await getToken(req);
       if (!userId) return res.status(401).json({ error: 'Unauthorized' });
 
-      _id = ObjectId(_id);
-      userId = ObjectId(userId);
+      _id = new ObjectId(_id);
+      userId = new ObjectId(userId);
       const file = await DBClient.filesCollection.findOne({ _id, userId });
       if (!file) return res.status(404).json({ error: 'Not found' });
       return res.status(200).json(file);
@@ -102,23 +102,22 @@ class FilesController {
 
   static async getIndex(req, res) {
     try {
-      let { parentId = 0, page = 0 } = req.query;
-      parentId = ObjectId(parentId);
-      page = +page;
-      const limit = 20;
-      const skip = page * limit;
       let userId = await getToken(req);
       if (!userId) return res.status(401).json({ error: 'Unauthorized' });
-      userId = ObjectId(userId);
 
-      const files = await DBClient.filesCollection.aggregate(
-        [
-          {
-            $match: {
-              parentId,
-              userId,
-            },
-          },
+      const { parentId, page = 0 } = req.query;
+      const limit = 20;
+      const skip = (+page) * limit;
+
+      let query;
+      if (!parentId) query = { userId: new ObjectId(userId) };
+      else query = {
+        parentId: new ObjectId(parentId),
+        userId: new ObjectId(userId)
+      };
+
+      const files = await DBClient.filesCollection.aggregate([
+          { $match: query },
           { $skip: skip },
           { $limit: limit },
         ],
