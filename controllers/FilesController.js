@@ -33,8 +33,8 @@ class FilesController {
         type,
         parentId = 0,
         isPublic = false,
+        data
       } = req.body;
-      const { data } = req.body;
       const listOfAcceptedType = ['folder', 'file', 'image'];
       const _id = ObjectId(userId);
 
