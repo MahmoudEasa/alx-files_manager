@@ -125,9 +125,9 @@ class FilesController {
       page = +page;
       const limit = 20;
       const skip = page * limit;
-
-      const userId = await getToken(req);
+      let userId = await getToken(req);
       if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+      userId = ObjectId(userId);
 
       const files = await DBClient.filesCollection.aggregate(
         [
