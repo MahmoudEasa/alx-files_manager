@@ -86,10 +86,8 @@ class FilesController {
 
   static async getShow(req, res) {
     try {
-      const token = req.header('x-token');
       let _id = req.params.id;
-      const redisKey = `auth_${token}`;
-      const userId = await RedisClient.getAsync(redisKey);
+      const userId = await getToken(req);
       if (!userId) return res.status(401).json({ error: 'Unauthorized' });
 
       _id = ObjectId(_id);
@@ -123,14 +121,11 @@ class FilesController {
 
   static async getIndex(req, res) {
     try {
-      const token = req.header('x-token');
-      const parentId = req.query.parentId || 0;
-      const page = req.query.page || 0;
+      const { parentId = 0, page = 0 } = req.query;
       const limit = 20;
-      const skip = page * limit;
+      const skip = (+page) * limit;
 
-      const redisKey = `auth_${token}`;
-      const userId = await RedisClient.getAsync(redisKey);
+      const userId = await getToken(req);
       if (!userId) return res.status(401).json({ error: 'Unauthorized' });
 
       const files = await DBClient.filesCollection.aggregate(
@@ -159,6 +154,8 @@ class FilesController {
 
   static async putPublish(req, res) {
     try {
+      const userId = await getToken(req);
+      if (!userId) return res.status(401).json({ error: 'Unauthorized' });
       return res.status(200).json({});
     } catch (err) {
       console.log(err);
@@ -168,6 +165,8 @@ class FilesController {
 
   static async putUnpublish(req, res) {
     try {
+      const userId = await getToken(req);
+      if (!userId) return res.status(401).json({ error: 'Unauthorized' });
       return res.status(200).json({});
     } catch (err) {
       console.log(err);
@@ -177,6 +176,8 @@ class FilesController {
 
   static async getFile(req, res) {
     try {
+      const userId = await getToken(req);
+      if (!userId) return res.status(401).json({ error: 'Unauthorized' });
       return res.status(200).json({});
     } catch (err) {
       console.log(err);
