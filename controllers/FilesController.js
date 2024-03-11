@@ -121,7 +121,7 @@ class FilesController {
   static async getIndex(req, res) {
     try {
       let { parentId = 0, page = 0 } = req.query;
-      if (parentId === '0') parentId = +parentId;
+      parentId = ObjectId(parentId);
       page = +page;
       const limit = 20;
       const skip = page * limit;
