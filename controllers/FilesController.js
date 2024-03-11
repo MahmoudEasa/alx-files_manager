@@ -87,22 +87,34 @@ class FilesController {
   static async getShow(req, res) {
     try {
       const token = req.header('x-token');
-      if (!token) return res.status(400).json({ error: 'Missing X-Token' });
-
+      let _id = req.params.id;
       const redisKey = `auth_${token}`;
-      const id = await RedisClient.getAsync(redisKey);
-      if (!id) return res.status(401).json({ error: 'Unauthorized' });
+      const userId = await RedisClient.getAsync(redisKey);
+      if (!userId) return res.status(401).json({ error: 'Unauthorized' });
 
-      const _id = new ObjectId(id);
-      const user = await DBClient.userCollection.findOne({ _id });
-      if (!user) return res.status(401).json({ error: 'Unauthorized' });
+      _id = ObjectId(_id);
+      const file = await DBClient.filesCollection.findOne({ _id, userId });
+      if (file) {
+        const {
+          _id,
+          userId,
+          name,
+          type,
+          isPublic,
+          parentId,
+        } = file;
 
-      const data = {
-        id: user._id,
-        email: user.email,
-      };
-
-      return res.status(200).json(data);
+        const data = {
+          id: _id.toString(),
+          userId,
+          name,
+          type,
+          isPublic,
+          parentId,
+        };
+        return res.status(200).json(data);
+      }
+      return res.status(404).json({ error: 'Not found' });
     } catch (err) {
       console.log(err);
       return res.status(500).json({ error: 'Internal Server Error' });
@@ -111,7 +123,34 @@ class FilesController {
 
   static async getIndex(req, res) {
     try {
-      return res.status(200).json({});
+      const token = req.header('x-token');
+      const parentId = req.query.parentId || 0;
+      const page = req.query.page || 0;
+      const limit = 20;
+      const skip = page * limit;
+
+      const redisKey = `auth_${token}`;
+      const userId = await RedisClient.getAsync(redisKey);
+      if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+
+      const files = await DBClient.filesCollection.aggregate(
+        [
+          {
+            $match: {
+              parentId,
+              userId,
+            },
+          },
+          { $skip: skip },
+          { $limit: limit },
+        ],
+      ).toArray();
+      const result = files.map(({ _id, localPath, ...el }) => ({
+        id: _id.toString(),
+        ...el,
+      }));
+
+      return res.status(200).json(result);
     } catch (err) {
       console.log(err);
       return res.status(500).json({ error: 'Internal Server Error' });
