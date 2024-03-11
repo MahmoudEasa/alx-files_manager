@@ -102,7 +102,7 @@ class FilesController {
 
   static async getIndex(req, res) {
     try {
-      let userId = await getToken(req);
+      const userId = await getToken(req);
       if (!userId) return res.status(401).json({ error: 'Unauthorized' });
 
       const { parentId, page = 0 } = req.query;
@@ -111,17 +111,18 @@ class FilesController {
 
       let query;
       if (!parentId) query = { userId: new ObjectId(userId) };
-      else query = {
-        parentId: new ObjectId(parentId),
-        userId: new ObjectId(userId)
-      };
+      else {
+        query = {
+          parentId: new ObjectId(parentId),
+          userId: new ObjectId(userId),
+        };
+      }
 
       const files = await DBClient.filesCollection.aggregate([
-          { $match: query },
-          { $skip: skip },
-          { $limit: limit },
-        ],
-      ).toArray();
+        { $match: query },
+        { $skip: skip },
+        { $limit: limit },
+      ]).toArray();
 
       const result = files.map(({ _id, localPath, ...el }) => ({
         id: _id,
