@@ -138,9 +138,30 @@ class FilesController {
 
   static async putPublish(req, res) {
     try {
-      const userId = await getToken(req);
+      let userId = await getToken(req);
       if (!userId) return res.status(401).json({ error: 'Unauthorized' });
-      return res.status(200).json({});
+      let _id = req.params.id;
+
+      _id = new ObjectId(_id);
+      userId = new ObjectId(userId);
+      let file = await DBClient.filesCollection.updateOne(
+        { _id, userId },
+        { $set: { isPublic: true } },
+      );
+      if (!file.modifiedCount) return res.status(404).json({ error: 'Not found' });
+      file = await DBClient.filesCollection.findOne({ _id, userId });
+      let result;
+      if (file) {
+        result = {
+          id: file._id,
+          userId: file.userId,
+          name: file.name,
+          type: file.type,
+          isPublic: file.isPublic,
+          parentId: file.parentId,
+        };
+      }
+      return res.status(200).json(result);
     } catch (err) {
       console.log(err);
       return res.status(500).json({ error: 'Internal Server Error' });
@@ -149,9 +170,31 @@ class FilesController {
 
   static async putUnpublish(req, res) {
     try {
-      const userId = await getToken(req);
+      let userId = await getToken(req);
       if (!userId) return res.status(401).json({ error: 'Unauthorized' });
-      return res.status(200).json({});
+      let _id = req.params.id;
+
+      _id = new ObjectId(_id);
+      userId = new ObjectId(userId);
+      let file = await DBClient.filesCollection.updateOne(
+        { _id, userId },
+        { $set: { isPublic: false } },
+      );
+      if (!file.modifiedCount) return res.status(404).json({ error: 'Not found' });
+      file = await DBClient.filesCollection.findOne({ _id, userId });
+
+      let result;
+      if (file) {
+        result = {
+          id: file._id,
+          userId: file.userId,
+          name: file.name,
+          type: file.type,
+          isPublic: file.isPublic,
+          parentId: file.parentId,
+        };
+      }
+      return res.status(200).json(result);
     } catch (err) {
       console.log(err);
       return res.status(500).json({ error: 'Internal Server Error' });
