@@ -20,11 +20,10 @@ const insertFile = async (fileData) => {
   return (result);
 };
 
-const putPublish = async (req, data, id) => {
+const putPublishHelp = async (req, data, id) => {
   let _id = req.params.id;
   _id = new ObjectId(_id);
-  const userId = id;
-  // const userId = new ObjectId(id);
+  const userId = new ObjectId(id);
   let file = await DBClient.filesCollection.findOneAndUpdate(
     { _id, userId },
     { $set: { isPublic: data } },
@@ -165,7 +164,7 @@ class FilesController {
     try {
       const userId = await getToken(req);
       if (!userId) return res.status(401).json({ error: 'Unauthorized' });
-      const result = await putPublish(req, true, userId);
+      const result = await putPublishHelp(req, true, userId);
 
       if (result) return res.status(200).json(result);
       return res.status(404).json({ error: 'Not found' });
@@ -179,7 +178,7 @@ class FilesController {
     try {
       const userId = await getToken(req);
       if (!userId) return res.status(401).json({ error: 'Unauthorized' });
-      const result = await putPublish(req, false, userId);
+      const result = await putPublishHelp(req, false, userId);
 
       if (result) return res.status(200).json(result);
       return res.status(404).json({ error: 'Not found' });
