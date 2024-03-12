@@ -39,7 +39,6 @@ class FilesController {
 
       const user = await DBClient.userCollection.findOne({ _id });
       if (!user) return res.status(400).json({ error: 'User not found' });
-
       if (!name) return res.status(400).json({ error: 'Missing name' });
       if (!type || !(listOfAcceptedType.includes(type))) {
         return res.status(400).json({ error: 'Missing type' });
@@ -153,7 +152,7 @@ class FilesController {
       let result;
       if (file) {
         result = {
-          id: file._id,
+          id: file._id.toString(),
           userId: file.userId,
           name: file.name,
           type: file.type,
@@ -186,7 +185,7 @@ class FilesController {
       let result;
       if (file) {
         result = {
-          id: file._id,
+          id: file._id.toString(),
           userId: file.userId,
           name: file.name,
           type: file.type,
