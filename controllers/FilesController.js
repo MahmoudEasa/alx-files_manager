@@ -23,24 +23,24 @@ const insertFile = async (fileData) => {
 const putPublishHelp = async (req, data, uId) => {
   let _id = req.params.id;
   _id = new ObjectId(_id);
-  // const userId = new ObjectId(uId);
+  const userId = new ObjectId(uId);
   let file = await DBClient.filesCollection.findOneAndUpdate(
-    { _id, userId: uId },
+    { _id, userId },
     { $set: { isPublic: data } },
     { returnDocument: 'after' },
   );
 
   if (file.value) {
     file = file.value;
-    const result = {
-      id: file._id.toString(),
-      userId: file.userId,
-      name: file.name,
-      type: file.type,
-      isPublic: file.isPublic,
-      parentId: file.parentId,
-    };
-    return (result);
+    // const result = {
+    //   id: file._id.toString(),
+    //   userId: file.userId,
+    //   name: file.name,
+    //   type: file.type,
+    //   isPublic: file.isPublic,
+    //   parentId: file.parentId,
+    // };
+    return (file);
   }
   return (null);
 };
