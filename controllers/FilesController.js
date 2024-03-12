@@ -24,10 +24,11 @@ const putPublishHelp = async (req, data, uId) => {
   let _id = req.params.id;
   _id = new ObjectId(_id);
   const userId = new ObjectId(uId);
+  // const userId = uId;
   let file = await DBClient.filesCollection.findOneAndUpdate(
     { _id, userId },
     { $set: { isPublic: data } },
-    { returnDocument: 'after' },
+    { returnOriginal: false },
   );
 
   if (file.value) {
