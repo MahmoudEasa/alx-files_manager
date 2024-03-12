@@ -1,7 +1,11 @@
 #!/usr/bin/env bash
 TOKEN="90c0bc88-2b95-441b-b440-63ccde273c5d"
 IDFOLDER='65ee1fa5d398bc02d3184f1c'
-IDFILE='65ef5aff2b616b2fe4d02872'
+IDFILE='65edcb5afc42123e20f40d2b'
+# IDFILE='65ef5aff2b616b2fe4d02872'
+
+# ======================================================================
+# curl -XGET "0.0.0.0:5000/files/65ef5aff2b616b2fe4d02872/publish" -H "X-Token: 90c0bc88-2b95-441b-b440-63ccde273c5d" ; echo ""
 
 # ======================================================================
 # echo 'db.files.find()' | mongo files_manager
@@ -22,15 +26,31 @@ IDFILE='65ef5aff2b616b2fe4d02872'
 
 # ======================================================================
 # Task 7
-# curl -XGET "0.0.0.0:5000/files/65ef5aff2b616b2fe4d02872/publish" -H "X-Token: 90c0bc88-2b95-441b-b440-63ccde273c5d" ; echo ""
-echo "Test 1"
-curl -XGET "0.0.0.0:5000/files/$IDFILE" -H "X-Token: $TOKEN" ; echo ""
+# echo "Test 1"
+# curl -XGET "0.0.0.0:5000/files/$IDFILE" -H "X-Token: $TOKEN" ; echo ""
+# echo
+# echo "Test 2"
+# curl -XPUT "0.0.0.0:5000/files/$IDFILE/publish" -H "X-Token: $TOKEN" ; echo ""
+# echo
+# echo "Test 3"
+# curl -XPUT "0.0.0.0:5000/files/$IDFILE/unpublish" -H "X-Token: $TOKEN" ; echo ""
+
+# ======================================================================
+# Task 8
+echo "Test 1 => false"
+curl -XPUT "0.0.0.0:5000/files/$IDFILE/unpublish" -H "X-Token: $TOKEN" ; echo ""
 echo
-echo "Test 2"
+echo "Test 2 => Hello Webstack!"
+curl -XGET "0.0.0.0:5000/files/$IDFILE/data" -H "X-Token: $TOKEN" ; echo ""
+echo
+echo "Test 3 => {"error":"Not found"}"
+curl -XGET "0.0.0.0:5000/files/$IDFILE/data" ; echo ""
+echo
+echo "Test 4 => true"
 curl -XPUT "0.0.0.0:5000/files/$IDFILE/publish" -H "X-Token: $TOKEN" ; echo ""
 echo
-echo "Test 3"
-curl -XPUT "0.0.0.0:5000/files/$IDFILE/unpublish" -H "X-Token: $TOKEN" ; echo ""
+echo "Test 5 => Hello Webstack!"
+curl -XGET "0.0.0.0:5000/files/$IDFILE/data" ; echo ""
 
 
 # ======================================================================
