@@ -23,9 +23,9 @@ const insertFile = async (fileData) => {
 const putPublishHelp = async (req, data, uId) => {
   let _id = req.params.id;
   _id = new ObjectId(_id);
-  const userId = new ObjectId(uId);
+  // const userId = new ObjectId(uId);
   let file = await DBClient.filesCollection.findOneAndUpdate(
-    { _id, userId },
+    { _id, userId: uId },
     { $set: { isPublic: data } },
     { returnDocument: 'after' },
   );
