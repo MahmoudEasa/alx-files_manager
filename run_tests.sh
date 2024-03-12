@@ -1,8 +1,12 @@
 #!/usr/bin/env bash
 TOKEN="90c0bc88-2b95-441b-b440-63ccde273c5d"
 IDFOLDER='65ee1fa5d398bc02d3184f1c'
-IDFILE='65edcb5afc42123e20f40d2b'
+IDFILE='65efcdf3787c32b33a519019'
 # IDFILE='65ef5aff2b616b2fe4d02872'
+
+# ======================================================================
+# Post File
+# curl -XPOST "0.0.0.0:5000/files" -H "X-Token: $TOKEN" -H "Content-Type: application/json" -d '{ "name": "myText.txt", "type": "file", "data": "SGVsbG8gV2Vic3RhY2shCg==" }' ; echo ""
 
 # ======================================================================
 # curl -XGET "0.0.0.0:5000/files/65ef5aff2b616b2fe4d02872/publish" -H "X-Token: 90c0bc88-2b95-441b-b440-63ccde273c5d" ; echo ""

@@ -1,9 +1,9 @@
 import { ObjectId } from 'mongodb';
 import { v4 as uuidv4 } from 'uuid';
 import fs from 'fs';
+import mime from 'mime-types';
 import DBClient from '../utils/db';
 import getToken from '../utils/getToken';
-import mime from 'mime-types';
 
 const insertFile = async (fileData) => {
   const createdFile = await DBClient.filesCollection.insertOne(fileData);
@@ -183,14 +183,14 @@ class FilesController {
     try {
       let _id = req.params.id;
       _id = new ObjectId(_id);
-      let userId = await getToken(req);
+      const userId = await getToken(req);
       const file = await DBClient.filesCollection.findOne({ _id });
       if (!file) return res.status(404).json({ error: 'Not found' });
-      
+
       if (!file.isPublic && (!userId || userId !== file.userId)) {
         return res.status(404).json({ error: 'Not found' });
       }
-      
+
       if (file.type === 'folder') {
         return res.status(400).json({ error: "A folder doesn't have content" });
       }
@@ -199,10 +199,8 @@ class FilesController {
       const mimeType = mime.lookup(file.name) || 'application/octet-stream';
       res.setHeader('Content-Type', mimeType);
       const fileContent = await fs.promises.readFile(file.localPath);
-      // console.log(fileContent);
-      // console.log(mimeType);
 
-      return res.status(200).send(fileContent);
+      return res.status(200).send(fileContent.toString());
     } catch (err) {
       if (err.code === 'ENOENT') return res.status(404).json({ error: 'Not found' });
       console.log(err);
