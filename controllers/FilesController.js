@@ -143,15 +143,15 @@ class FilesController {
 
       _id = new ObjectId(_id);
       userId = new ObjectId(userId);
-      let file = await DBClient.filesCollection.updateOne(
+      let file = await DBClient.filesCollection.findOneAndUpdate(
         { _id, userId },
         { $set: { isPublic: true } },
+        { returnDocument: 'after' },
       );
-      if (!file.modifiedCount) return res.status(404).json({ error: 'Not found' });
-      file = await DBClient.filesCollection.findOne({ _id, userId });
-      let result;
-      if (file) {
-        result = {
+
+      if (file.value) {
+        file = file.value;
+        const result = {
           id: file._id.toString(),
           userId: file.userId,
           name: file.name,
@@ -159,8 +159,9 @@ class FilesController {
           isPublic: file.isPublic,
           parentId: file.parentId,
         };
+        return res.status(200).json(result);
       }
-      return res.status(200).json(result);
+      return res.status(404).json({ error: 'Not found' });
     } catch (err) {
       console.log(err);
       return res.status(500).json({ error: 'Internal Server Error' });
@@ -175,16 +176,14 @@ class FilesController {
 
       _id = new ObjectId(_id);
       userId = new ObjectId(userId);
-      let file = await DBClient.filesCollection.updateOne(
+      let file = await DBClient.filesCollection.findOneAndUpdate(
         { _id, userId },
         { $set: { isPublic: false } },
+        { returnDocument: 'after' },
       );
-      if (!file.modifiedCount) return res.status(404).json({ error: 'Not found' });
-      file = await DBClient.filesCollection.findOne({ _id, userId });
-
-      let result;
-      if (file) {
-        result = {
+      if (file.value) {
+        file = file.value;
+        const result = {
           id: file._id.toString(),
           userId: file.userId,
           name: file.name,
@@ -192,8 +191,9 @@ class FilesController {
           isPublic: file.isPublic,
           parentId: file.parentId,
         };
+        return res.status(200).json(result);
       }
-      return res.status(200).json(result);
+      return res.status(404).json({ error: 'Not found' });
     } catch (err) {
       console.log(err);
       return res.status(500).json({ error: 'Internal Server Error' });
