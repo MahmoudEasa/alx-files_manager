@@ -187,7 +187,7 @@ class FilesController {
       const file = await DBClient.filesCollection.findOne({ _id });
       if (!file) return res.status(404).json({ error: 'Not found' });
 
-      if (!file.isPublic && (!userId || userId !== file.userId)) {
+      if (!file.isPublic && (!userId || userId !== file.userId.toString())) {
         return res.status(404).json({ error: 'Not found' });
       }
 
@@ -200,7 +200,7 @@ class FilesController {
       res.setHeader('Content-Type', mimeType);
       const fileContent = await fs.promises.readFile(file.localPath);
 
-      return res.status(200).send(fileContent.toString());
+      return res.status(200).send(fileContent);
     } catch (err) {
       if (err.code === 'ENOENT') return res.status(404).json({ error: 'Not found' });
       console.log(err);
