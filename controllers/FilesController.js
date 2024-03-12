@@ -20,6 +20,32 @@ const insertFile = async (fileData) => {
   return (result);
 };
 
+const putPublish = async (req, data, id) => {
+  let _id = req.params.id;
+  _id = new ObjectId(_id);
+  const userId = id;
+  // const userId = new ObjectId(id);
+  let file = await DBClient.filesCollection.findOneAndUpdate(
+    { _id, userId },
+    { $set: { isPublic: data } },
+    { returnDocument: 'after' },
+  );
+
+  if (file.ok) {
+    file = file.value;
+    const result = {
+      id: file._id.toString(),
+      userId: file.userId,
+      name: file.name,
+      type: file.type,
+      isPublic: file.isPublic,
+      parentId: file.parentId,
+    };
+    return (result);
+  }
+  return (null);
+};
+
 class FilesController {
   static async postUpload(req, res) {
     try {
@@ -137,30 +163,11 @@ class FilesController {
 
   static async putPublish(req, res) {
     try {
-      let userId = await getToken(req);
+      const userId = await getToken(req);
       if (!userId) return res.status(401).json({ error: 'Unauthorized' });
-      let _id = req.params.id;
+      const result = await putPublish(req, true, userId);
 
-      _id = new ObjectId(_id);
-      userId = new ObjectId(userId);
-      let file = await DBClient.filesCollection.findOneAndUpdate(
-        { _id, userId },
-        { $set: { isPublic: true } },
-        { returnDocument: 'after' },
-      );
-
-      if (file.value) {
-        file = file.value;
-        const result = {
-          id: file._id.toString(),
-          userId: file.userId,
-          name: file.name,
-          type: file.type,
-          isPublic: file.isPublic,
-          parentId: file.parentId,
-        };
-        return res.status(200).json(result);
-      }
+      if (result) return res.status(200).json(result);
       return res.status(404).json({ error: 'Not found' });
     } catch (err) {
       console.log(err);
@@ -170,29 +177,11 @@ class FilesController {
 
   static async putUnpublish(req, res) {
     try {
-      let userId = await getToken(req);
+      const userId = await getToken(req);
       if (!userId) return res.status(401).json({ error: 'Unauthorized' });
-      let _id = req.params.id;
+      const result = await putPublish(req, false, userId);
 
-      _id = new ObjectId(_id);
-      userId = new ObjectId(userId);
-      let file = await DBClient.filesCollection.findOneAndUpdate(
-        { _id, userId },
-        { $set: { isPublic: false } },
-        { returnDocument: 'after' },
-      );
-      if (file.value) {
-        file = file.value;
-        const result = {
-          id: file._id.toString(),
-          userId: file.userId,
-          name: file.name,
-          type: file.type,
-          isPublic: file.isPublic,
-          parentId: file.parentId,
-        };
-        return res.status(200).json(result);
-      }
+      if (result) return res.status(200).json(result);
       return res.status(404).json({ error: 'Not found' });
     } catch (err) {
       console.log(err);
