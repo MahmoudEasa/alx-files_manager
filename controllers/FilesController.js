@@ -24,25 +24,13 @@ const putPublishHelp = async (req, data, uId) => {
   let _id = req.params.id;
   _id = new ObjectId(_id);
   const userId = new ObjectId(uId);
-  // const userId = uId;
-  let file = await DBClient.filesCollection.findOneAndUpdate(
+  const file = await DBClient.filesCollection.findOneAndUpdate(
     { _id, userId },
     { $set: { isPublic: data } },
     { returnOriginal: false },
   );
 
-  if (file.value) {
-    file = file.value;
-    // const result = {
-    //   id: file._id.toString(),
-    //   userId: file.userId,
-    //   name: file.name,
-    //   type: file.type,
-    //   isPublic: file.isPublic,
-    //   parentId: file.parentId,
-    // };
-    return (file);
-  }
+  if (file.value) return (file.value);
   return (null);
 };
 
