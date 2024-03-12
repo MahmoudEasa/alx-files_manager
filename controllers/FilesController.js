@@ -24,7 +24,6 @@ const insertFile = async (fileData) => {
 const putPublishHelp = async (req, data, uId) => {
   let _id = req.params.id;
   _id = new ObjectId(_id);
-  // const userId = uId;
   const userId = new ObjectId(uId);
   const file = await DBClient.filesCollection.findOneAndUpdate(
     { _id, userId },

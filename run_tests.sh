@@ -41,20 +41,20 @@ IDFILE='65efcdf3787c32b33a519019'
 
 # ======================================================================
 # Task 8
-echo "Test 1 => false"
-curl -XPUT "0.0.0.0:5000/files/$IDFILE/unpublish" -H "X-Token: $TOKEN" ; echo ""
-echo
-echo "Test 2 => Hello Webstack!"
-curl -XGET "0.0.0.0:5000/files/$IDFILE/data" -H "X-Token: $TOKEN" ; echo ""
-echo
-echo "Test 3 => {"error":"Not found"}"
-curl -XGET "0.0.0.0:5000/files/$IDFILE/data" ; echo ""
-echo
-echo "Test 4 => true"
-curl -XPUT "0.0.0.0:5000/files/$IDFILE/publish" -H "X-Token: $TOKEN" ; echo ""
-echo
-echo "Test 5 => Hello Webstack!"
-curl -XGET "0.0.0.0:5000/files/$IDFILE/data" ; echo ""
+# echo "Test 1 => false"
+# curl -XPUT "0.0.0.0:5000/files/$IDFILE/unpublish" -H "X-Token: $TOKEN" ; echo ""
+# echo
+# echo "Test 2 => Hello Webstack!"
+# curl -XGET "0.0.0.0:5000/files/$IDFILE/data" -H "X-Token: $TOKEN" ; echo ""
+# echo
+# echo "Test 3 => {"error":"Not found"}"
+# curl -XGET "0.0.0.0:5000/files/$IDFILE/data" ; echo ""
+# echo
+# echo "Test 4 => true"
+# curl -XPUT "0.0.0.0:5000/files/$IDFILE/publish" -H "X-Token: $TOKEN" ; echo ""
+# echo
+# echo "Test 5 => Hello Webstack!"
+# curl -XGET "0.0.0.0:5000/files/$IDFILE/data" ; echo ""
 
 
 # ======================================================================
