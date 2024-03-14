@@ -2,6 +2,7 @@ import { ObjectId } from 'mongodb';
 import { v4 as uuidv4 } from 'uuid';
 import fs from 'fs';
 import mime from 'mime-types';
+import Queue from 'bull';
 import DBClient from '../utils/db';
 import getToken from '../utils/getToken';
 
@@ -33,6 +34,15 @@ const putPublishHelp = async (req, data, uId) => {
 
   if (file.value) return (file.value);
   return (null);
+};
+
+const addToQueue = async (userId, fileId) => {
+  try {
+    const fileQueue = new Queue('fileQueue');
+    await fileQueue.add({ userId, fileId });
+  } catch (err) {
+    console.log(err);
+  }
 };
 
 class FilesController {
@@ -90,6 +100,8 @@ class FilesController {
       fileData.localPath = filePath;
 
       const result = await insertFile(fileData);
+      if (result.type === 'image') await addToQueue(result.userId, result.id);
+
       return res.status(201).json(result);
     } catch (err) {
       console.log(err);
@@ -180,8 +192,10 @@ class FilesController {
 
   static async getFile(req, res) {
     try {
-      let _id = req.params.id;
-      _id = new ObjectId(_id);
+      const _id = new ObjectId(req.params.id);
+      const { size } = req.query;
+      const sizes = [500, 250, 100];
+
       const userId = await getToken(req);
       const file = await DBClient.filesCollection.findOne({ _id });
       if (!file) return res.status(404).json({ error: 'Not found' });
@@ -193,6 +207,8 @@ class FilesController {
       if (file.type === 'folder') {
         return res.status(400).json({ error: "A folder doesn't have content" });
       }
+
+      if (size && sizes.includes(size)) file.localPath = `${file.localPath}_${size}`;
 
       await fs.promises.stat(file.localPath);
       const mimeType = mime.lookup(file.name) || 'application/octet-stream';

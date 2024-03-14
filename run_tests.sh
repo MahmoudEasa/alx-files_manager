@@ -1,12 +1,18 @@
 #!/usr/bin/env bash
-TOKEN="90c0bc88-2b95-441b-b440-63ccde273c5d"
+TOKEN="9eb89073-354a-4d5d-bbb6-bd944edcd544"
 IDFOLDER='65ee1fa5d398bc02d3184f1c'
-IDFILE='65efcdf3787c32b33a519019'
+IDFILE='65f0c76d482ad7daa7f20eba'
+# IDFILE='65efcdf3787c32b33a519019'
 # IDFILE='65ef5aff2b616b2fe4d02872'
+
+# ======================================================================
+# Connect
+# curl "0.0.0.0:5000/connect" -H "Authorization: Basic Ym9iQGR5bGFuLmNvbTp0b3RvMTIzNCE=" ; echo ""
 
 # ======================================================================
 # Post File
 # curl -XPOST "0.0.0.0:5000/files" -H "X-Token: $TOKEN" -H "Content-Type: application/json" -d '{ "name": "myText.txt", "type": "file", "data": "SGVsbG8gV2Vic3RhY2shCg==" }' ; echo ""
+curl -XPOST "0.0.0.0:5000/files" -H "X-Token: $TOKEN" -H "Content-Type: application/json" -d '{ "name": "image.png", "type": "image", "data": "SGVsbG8gV2Vic3RhY2shCg==" }' ; echo ""
 
 # ======================================================================
 # curl -XGET "0.0.0.0:5000/files/65ef5aff2b616b2fe4d02872/publish" -H "X-Token: 90c0bc88-2b95-441b-b440-63ccde273c5d" ; echo ""
